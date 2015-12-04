@@ -52,13 +52,23 @@ void	clkhandler()
 	/* Reschedule if necessary	    */
 
 	if((--preempt) == 0) {
-#if 1
+#if 0
         /* jteague6 - SJF scheduler: If the current process is not the null
          * process and its priority is not 1, decrement its priority to show
          * that it is a longer-running process. */
         prptr = &proctab[currpid];
         if( currpid != 0 && prptr->prprio > 1 ) {
             --prptr->prprio;
+        }
+#endif
+#if 1
+        /* jteague6 - Random scheduler: use the process' current priority as
+         * a seed for srand and get a new random number for its priority before
+         * calling resched() */
+        prptr = &proctab[currpid];
+        if( currpid != 0 ) {
+            srand( (uint32)prptr->prprio );
+            prptr->prprio = rand();
         }
 #endif
 		preempt = QUANTUM;

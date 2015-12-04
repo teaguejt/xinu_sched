@@ -47,7 +47,7 @@ pid32	create(
 	/* jteague6 - original code for default scheduler */
     prptr->prprio = priority;
 #endif
-#if 1
+#if 0
     /* jteague6 - SJF scheduler: each process except the null process gets
      * assigned a "priority" of ten. This value will be decremented every time
      * this process is stopped by clkhandler() to signify it as longer running,
@@ -58,6 +58,21 @@ pid32	create(
     }
     else {
         prptr->prprio = 10;
+    }
+#endif
+#if 1
+    /* jteague6 - Random scheduler: each process except the null process gets
+     * assigned a "priority" as follows:
+     * - seed srand() with its stack address as a uint32 multiplied by (system
+     *   uptime in seconds + 127)
+     * - use rand() to obtain an actual priority value
+     * null process still gets 0 as a priority. */
+    if( pid == 0 ) {
+        prptr->prprio = 0;
+    }
+    else {
+        srand( (uint32)( ( clktime + 127 ) * (uint32)saddr ) );
+        prptr->prprio = (uint32)rand();
     }
 #endif
 	prptr->prstkbase = (char *)saddr;
