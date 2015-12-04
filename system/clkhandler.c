@@ -12,6 +12,7 @@ void	clkhandler()
 	static uint32 count1000 = 1000;	/* variable to count 1000ms */
 	volatile struct am335x_timer1ms *csrptr = 0x44E31000;
 					/* Pointer to timer CSR	    */
+    struct procent *prptr;      /* jteague6: pointer to current process */
 
 	/* If there is no interrupt, return */
 
@@ -51,6 +52,15 @@ void	clkhandler()
 	/* Reschedule if necessary	    */
 
 	if((--preempt) == 0) {
+#if 1
+        /* jteague6 - SJF scheduler: If the current process is not the null
+         * process and its priority is not 1, decrement its priority to show
+         * that it is a longer-running process. */
+        prptr = &proctab[currpid];
+        if( currpid != 0 && prptr->prprio > 1 ) {
+            --prptr->prprio;
+        }
+#endif
 		preempt = QUANTUM;
 		resched();
 	}

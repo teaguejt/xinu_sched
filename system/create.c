@@ -43,7 +43,23 @@ pid32	create(
 
 	/* initialize process table entry for new process */
 	prptr->prstate = PR_SUSP;	/* initial state is suspended	*/
-	prptr->prprio = priority;
+#if 0
+	/* jteague6 - original code for default scheduler */
+    prptr->prprio = priority;
+#endif
+#if 1
+    /* jteague6 - SJF scheduler: each process except the null process gets
+     * assigned a "priority" of ten. This value will be decremented every time
+     * this process is stopped by clkhandler() to signify it as longer running,
+     * with a value of 1 indicating extremely long running processes. A value
+     * of zero is reserved for the null process */
+    if( pid == 0 ) {
+        prptr->prprio = 0;
+    }
+    else {
+        prptr->prprio = 10;
+    }
+#endif
 	prptr->prstkbase = (char *)saddr;
 	prptr->prstklen = ssize;
 	prptr->prname[PNMLEN-1] = NULLCH;
